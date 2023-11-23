@@ -3,9 +3,11 @@ import {
 	getAuth,
 	signInWithRedirect,
 	signInWithPopup,
-    signInWithEmailAndPassword,
+	signInWithEmailAndPassword,
 	GoogleAuthProvider,
-    createUserWithEmailAndPassword
+	createUserWithEmailAndPassword,
+	signOut,
+	onAuthStateChanged,
 } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 
@@ -30,54 +32,67 @@ googleProvider.setCustomParameters({
 
 export const auth = getAuth();
 export const signWithGooglePopup = () => signInWithPopup(auth, googleProvider);
-export const signInWithGoogleRedirect = () => signInWithRedirect(auth, googleProvider);
+export const signInWithGoogleRedirect = () =>
+	signInWithRedirect(auth, googleProvider);
 
 export const db = getFirestore();
 
-export const createUserDocumentFromAuth = async (userAuth, additionalInformation = {}) => {
-    if (!userAuth) return;
+export const createUserDocumentFromAuth = async (
+	userAuth,
+	additionalInformation = {}
+) => {
+	if (!userAuth) return;
 
-    const userDocRef = doc(db, 'users', userAuth.uid);
-    const userSnapshot = await getDoc(userDocRef);
+	const userDocRef = doc(db, 'users', userAuth.uid);
+	const userSnapshot = await getDoc(userDocRef);
 
-    if(!userSnapshot.exists()) {
-        const { displayName, email } = userAuth;
-        const createdAt = new Date();
+	if (!userSnapshot.exists()) {
+		const { displayName, email } = userAuth;
+		const createdAt = new Date();
 
-        try {
-            await setDoc(userDocRef, {
-                displayName,
-                email,
-                createdAt,
-                ...additionalInformation,
-            }); 
-        } catch(error) {
-            console.log('error creating the user', error.message);
-        }
-    }
+		try {
+			await setDoc(userDocRef, {
+				displayName,
+				email,
+				createdAt,
+				...additionalInformation,
+			});
+		} catch (error) {
+			console.log('error creating the user', error.message);
+		}
+	}
 
-    return userDocRef;
+	return userDocRef;
 
-    //if user data exists 
-    //if user data does not extist, set the document with the data from userAUth in my collecction
-    //return back userDocRef
+	//if user data exists
+	//if user data does not extist, set the document with the data from userAUth in my collecction
+	//return back userDocRef
 };
 
 export const createAuthUserWithEmailAndPassword = async (email, password) => {
-    if (!email || !password) return;
+	if (!email || !password) return;
 
-    return await createUserWithEmailAndPassword(auth, email, password);
+	return await createUserWithEmailAndPassword(auth, email, password);
 };
 
 export const signInAuthUserWithEmailAndPassword = async (email, password) => {
-    if (!email || !password) return;
+	if (!email || !password) return;
 
-    try{
-        const userCrendtial =  await signInWithEmailAndPassword(auth, email, password);
-        console.log(userCrendtial);
-    } catch(error) {
-        if (error.code) {
-            console.log(`${error.code} ${error.message}`);
-        }
-    }
-}
+	try {
+		const userCrendtial = await signInWithEmailAndPassword(
+			auth,
+			email,
+			password
+		);
+		return userCrendtial;
+	} catch (error) {
+		if (error.code) {
+			console.log(`${error.code} ${error.message}`);
+		}
+	}
+};
+
+export const signOutUser = async () => await signOut(auth);
+
+export const onAuthStateChangedListener = (callback) =>
+	onAuthStateChanged(auth, callback);
