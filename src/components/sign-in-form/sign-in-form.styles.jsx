@@ -4,10 +4,10 @@ export const SignInContainer = styled.div`
 	display: flex;
 	flex-direction: column;
 	width: 380px;
-`;
 
-export const SignInTitle = styled.h2`
-	margin: 10px 0px;
+	h2 {
+		margin: 10px 0px;
+	}
 `;
 
 export const ButtonsContainer = styled.div`

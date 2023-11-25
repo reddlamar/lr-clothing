@@ -1,12 +1,13 @@
 import { useState } from 'react';
 import FormInput from '../../components/form-input/form-input.component';
-import Button, { BUTTON_TYPE_CLASSES } from '../../components/button/button.component';
+import Button, {
+	BUTTON_TYPE_CLASSES,
+} from '../../components/button/button.component';
 import {
 	signWithGooglePopup,
 	signInAuthUserWithEmailAndPassword,
-	createUserDocumentFromAuth,
 } from '../../utils/firebase/firebase.utils';
-import {SignInContainer, SignInTitle, ButtonsContainer} from './sign-in-form.styles.jsx';
+import { SignInContainer, ButtonsContainer } from './sign-in-form.styles.jsx';
 
 const defautFormFieds = {
 	email: '',
@@ -25,20 +26,19 @@ const SignInForm = () => {
 		event.preventDefault();
 
 		try {
-			const { user } = await signInAuthUserWithEmailAndPassword(email, password);
-            
+			await signInAuthUserWithEmailAndPassword(email, password);
 			resetFormFields();
 		} catch (error) {
-            switch(error.code) {
-                case 'aut/wrong-password':
-                    alert('incorrect password for email');
-                    break;    
-                case 'auth/user-not-found':
-                    alert('no user associated with this email');
-                    break;
-                default:                
-                    console.log(error);
-            }            
+			switch (error.code) {
+				case 'aut/wrong-password':
+					alert('incorrect password for email');
+					break;
+				case 'auth/user-not-found':
+					alert('no user associated with this email');
+					break;
+				default:
+					console.log(error);
+			}
 		}
 	};
 
@@ -48,40 +48,44 @@ const SignInForm = () => {
 	};
 
 	const signInWithGoogle = async () => {
-		await signWithGooglePopup();	    
+		await signWithGooglePopup();
 	};
 
 	return (
 		<SignInContainer>
-        <SignInTitle>Already have an account</SignInTitle>
-        <span>Sign in with your email and password</span>
+			<h2>Already have an account</h2>
+			<span>Sign in with your email and password</span>
 			<FormInput
 				label='Email'
-				inputOptions={{
-					type: 'email',
-					required: true,
-					onChange: handleChange,
-					name: 'email',
-					value: email,
-				}}
+				type='email'
+				required
+				onChange={handleChange}
+				name='email'
+				value={email}
 			/>
 
 			<FormInput
 				label='Password'
-				inputOptions={{
-					type: 'password',
-					required: true,
-					onChange: handleChange,
-					name: 'password',
-					value: password,
-				}}
+				type='password'
+				required
+				onChange={handleChange}
+				name='password'
+				value={password}
 			/>
-            <ButtonsContainer>
-                <Button type='submit' buttonType={BUTTON_TYPE_CLASSES.base} onClick={handleSubmit}>Sign In</Button>
-                <Button type='button' buttonType={BUTTON_TYPE_CLASSES.google} onClick={signInWithGoogle}>
-                    Google Sign In
-                </Button>
-            </ButtonsContainer>
+			<ButtonsContainer>
+				<Button
+					type='submit'
+					buttonType={BUTTON_TYPE_CLASSES.base}
+					onClick={handleSubmit}>
+					Sign In
+				</Button>
+				<Button
+					type='button'
+					buttonType={BUTTON_TYPE_CLASSES.google}
+					onClick={signInWithGoogle}>
+					Google Sign In
+				</Button>
+			</ButtonsContainer>
 		</SignInContainer>
 	);
 };
