@@ -95,7 +95,7 @@ export const createUserDocumentFromAuth = async (
 		}
 	}
 
-	return userDocRef;
+	return userSnapshot;
 
 	//if user data exists
 	//if user data does not extist, set the document with the data from userAUth in my collecction
@@ -112,12 +112,12 @@ export const signInAuthUserWithEmailAndPassword = async (email, password) => {
 	if (!email || !password) return;
 
 	try {
-		const userCrendtial = await signInWithEmailAndPassword(
+		const userCredential = await signInWithEmailAndPassword(
 			auth,
 			email,
 			password
 		);
-		return userCrendtial;
+		return userCredential;
 	} catch (error) {
 		if (error.code) {
 			console.log(`${error.code} ${error.message}`);
@@ -129,3 +129,16 @@ export const signOutUser = async () => await signOut(auth);
 
 export const onAuthStateChangedListener = (callback) =>
 	onAuthStateChanged(auth, callback);
+
+export const getCurrentUser = () => {
+	return new Promise((resolve, reject) => {
+		const unsubscribe = onAuthStateChanged(
+			auth,
+			(userAuth) => {
+				unsubscribe();
+				resolve(userAuth);
+			},
+			reject
+		);
+	});
+};
